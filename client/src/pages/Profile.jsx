@@ -1,130 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Paper,
-  Alert,
-  CircularProgress,
-  Grid
-} from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-function Profile() {
-  const { user, updateProfile } = useAuth();
-  const [formData, setFormData] = useState({
-    username: user?.username || '',
-    email: user?.email || '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        username: user.username || '',
-        email: user.email || '',
-      });
-    }
-  }, [user]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
-
-    try {
-      await updateProfile(formData);
-      setSuccess('Profile updated successfully');
-    } catch (error) {
-      console.error('Profile update error:', error);
-      setError(error.message || 'Failed to update profile');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!user) {
-    return (
-      <Container maxWidth="sm">
-        <Box sx={{ mt: 4 }}>
-          <Alert severity="error">Please log in to view your profile</Alert>
-        </Box>
-      </Container>
-    );
-  }
-
+const Profile = () => {
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography component="h1" variant="h4" gutterBottom>
-            Profile
-          </Typography>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              </Grid>
-            </Grid>
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3 }}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Update Profile'}
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+    <motion.div 
+      className="min-h-screen p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="flex items-center mb-8"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+        >
+          <Link to="/dashboard">
+            <button className="mr-4 text-blue-400 hover:text-blue-300">
+              ← Back to Dashboard
+            </button>
+          </Link>
+          <h1 className="text-3xl font-bold">Your Profile</h1>
+        </motion.div>
+        
+        <motion.div 
+          className="bg-gray-800 bg-opacity-50 p-8 rounded-lg mb-6"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
+            <div className="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-3xl font-bold">
+              JP
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold mb-2">John Doe</h2>
+              <p className="text-gray-400">john.doe@example.com</p>
+              <p className="text-gray-400">Account created: January 15, 2023</p>
+            </div>
+          </div>
+          
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">Account Information</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-sm text-gray-400 mb-1">Full Name</p>
+                <p>John Paul Doe</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400 mb-1">Email Address</p>
+                <p>john.doe@example.com</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400 mb-1">Phone Number</p>
+                <p>+1 (555) 123-4567</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400 mb-1">Date of Birth</p>
+                <p>May 12, 1985</p>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Security</h3>
+            <div className="space-y-4">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Change Password
+              </button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Two-Factor Authentication
+              </button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Connected Accounts
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
   );
-}
+};
 
 export default Profile; 

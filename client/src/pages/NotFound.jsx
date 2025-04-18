@@ -1,38 +1,46 @@
 import React from 'react';
-import { Container, Box, Typography, Button } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-function NotFound() {
+const NotFound = () => {
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          mt: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Typography component="h1" variant="h2" gutterBottom>
-          404
-        </Typography>
-        <Typography variant="h5" color="text.secondary" paragraph>
-          Page Not Found
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
-          The page you are looking for does not exist.
-        </Typography>
-        <Button
-          component={RouterLink}
-          to="/"
-          variant="contained"
-          size="large"
+    <motion.div 
+      className="min-h-screen flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <div className="text-center">
+        <motion.h1 
+          className="text-6xl font-bold mb-4"
+          initial={{ y: -50 }}
+          animate={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 100 }}
         >
-          Go to Home
-        </Button>
-      </Box>
-    </Container>
+          404
+        </motion.h1>
+        
+        <motion.p 
+          className="text-xl mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Page not found
+        </motion.p>
+        
+        <Link to="/">
+          <motion.button
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Go Home
+          </motion.button>
+        </Link>
+      </div>
+    </motion.div>
   );
-}
+};
 
 export default NotFound; 

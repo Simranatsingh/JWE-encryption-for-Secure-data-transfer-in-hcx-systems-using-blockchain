@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth.routes');
 const reportsRoutes = require('./routes/reports.routes');
 const { fixDatabaseIndexes } = require('./utils/db');
 const { getSystemHealth, logDatabaseStats } = require('./utils/diagnostics');
+const axios = require('axios');
 
 // Load environment variables
 dotenv.config();
@@ -82,6 +83,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// Function to fetch records
+const fetchRecords = async () => {
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/health/records`);
+    setRecords(response.data.ownRecords);
+    setAccessRequests(response.data.sharedRecords);
+  } catch (error) {
+    console.error('Error fetching records:', error);
+  }
+};
+
 // Start server - simplified and fixed
 const BASE_PORT = process.env.PORT || 5005;
 const PORTS_TO_TRY = [5005, 8000, 8001, 9000]; // Predefined ports to try in order
@@ -122,7 +134,7 @@ const startServer = (attemptCount = 0) => {
 };
 
 // Connect to MongoDB first, then start the server
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hcx')
   .then(async () => {
     console.log('Connected to MongoDB');
     
@@ -140,4 +152,4 @@ app.use((err, req, res, next) => {
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'production' ? 'An internal server error occurred' : err.message
   });
-}); 
+});

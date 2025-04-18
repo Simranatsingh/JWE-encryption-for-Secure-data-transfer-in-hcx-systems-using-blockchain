@@ -181,4 +181,46 @@ const reportsService = {
         ...Object.fromEntries(formData),
         ipfsHash,
         blockchainHash: reportHash
-      }
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Report uploaded successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error uploading report:', error.response?.data || error.message);
+      throw error.response ? error.response.data : error;
+    }
+  },
+
+  // Add method to verify report on blockchain
+  verifyReport: async (reportId) => {
+    try {
+      const blockchainReport = await blockchainService.getReport(reportId);
+      const dbReport = await this.getReport(reportId);
+
+      // Compare hashes to verify authenticity
+      const isVerified = blockchainReport.ipfsHash === dbReport.ipfsHash;
+      
+      return {
+        isVerified,
+        blockchainData: blockchainReport,
+        dbData: dbReport
+      };
+    } catch (error) {
+      console.error('Error verifying report:', error);
+      throw error;
+    }
+  }
+};
+
+// Helper function to upload to IPFS
+async function uploadToIPFS(file) {
+  // You'll need to implement this using a service like Infura IPFS
+  // or Pinata
+  throw new Error('IPFS upload not implemented');
+}
+
+export default reportsService; 
