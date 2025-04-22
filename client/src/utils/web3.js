@@ -1,6 +1,9 @@
 import { ethers } from 'ethers';
 import Web3 from 'web3';
 
+// Default contract address as fallback
+const DEFAULT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 // ABI from the contract compilation
 const contractABI = [
   // This is a placeholder, replace with your actual contract ABI
@@ -69,8 +72,15 @@ const contractABI = [
   }
 ];
 
-// Contract address from environment variables
-const contractAddress = import.meta.env.CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+// Contract address from environment variables with fallback
+const getContractAddress = () => {
+  // Try different ways to access the env var
+  return (
+    import.meta.env.CONTRACT_ADDRESS || 
+    import.meta.env.VITE_CONTRACT_ADDRESS || 
+    DEFAULT_CONTRACT_ADDRESS
+  );
+};
 
 /**
  * Connect to MetaMask and get the provider and signer
@@ -100,6 +110,8 @@ export const connectWallet = async () => {
  * @returns {Object} Contract instance
  */
 export const getContract = (signer) => {
+  const contractAddress = getContractAddress();
+  console.log("Using contract address:", contractAddress);
   return new ethers.Contract(contractAddress, contractABI, signer);
 };
 

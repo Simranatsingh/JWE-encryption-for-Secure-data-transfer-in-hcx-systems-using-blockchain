@@ -8,17 +8,19 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to Fleek
+    name: Deploy to IPFS via Fleek
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
           
       - name: Install dependencies
         run: |
@@ -29,17 +31,24 @@ jobs:
         run: |
           cd client
           echo "VITE_WEB3_MODE=true" > .env.production
-          echo "CONTRACT_ADDRESS=${{ secrets.CONTRACT_ADDRESS }}" >> .env.production
-          echo "VITE_API_URL=https://your-api-endpoint.vercel.app/api" >> .env.production
+          echo "CONTRACT_ADDRESS=0x0000000000000000000000000000000000000000" >> .env.production
+          echo "VITE_API_URL=https://api.yourdomain.com/api" >> .env.production
           
       - name: Build for Web3
         run: |
           cd client
           npm run build:web3
           
-      - name: Deploy to Fleek
-        uses: fleekhq/action-deploy@v1
-        with:
-          apiKey: ${{ secrets.FLEEK_API_KEY }}
-          workDir: client/dist
-          site: ${{ secrets.FLEEK_SITE_ID }} 
+      - name: Install IPFS CLI
+        run: npm install -g ipfs-deploy
+          
+      - name: Deploy to IPFS
+        working-directory: ./client
+        run: |
+          npx ipfs-deploy ./dist -p infura
+        env:
+          IPFS_DEPLOY_INFURA__PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+          IPFS_DEPLOY_INFURA__API_KEY_SECRET: ${{ secrets.INFURA_API_KEY_SECRET }}
+          
+      - name: Log deployment info
+        run: echo "✅ Deployed to IPFS. The hash will be displayed in the logs above." 
