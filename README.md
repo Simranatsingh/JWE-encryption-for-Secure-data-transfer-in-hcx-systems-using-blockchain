@@ -140,13 +140,24 @@ This application has been configured for deployment to Fleek, which allows hosti
 
 To deploy to Fleek:
 
-1. Follow the instructions in `client/FLEEK_DEPLOYMENT.md`
-2. Build the client with `npm run build:fleek`
-3. The client will connect directly to Supabase for authentication and data management
+1. Log in to [Fleek](https://app.fleek.co/) and create a new site
+2. Connect to your GitHub repository: `Simranatsingh/JWE-encryption-for-Secure-data-transfer-in-hcx-systems-using-blockchain`
+3. Configure the build settings as follows:
+   - **Framework**: Other
+   - **Docker Image**: node:16
+   - **Build Command**: `bash ./build-for-fleek.sh`
+   - **Publish Directory**: `client/dist`
+   - **Base Directory**: `/` (default)
+   - **Environment Variables**:
+     - `VITE_FLEEK_DEPLOYMENT`: `true`
+     - `VITE_SUPABASE_URL`: `https://ekhuscbqsqrljhkzukak.supabase.co`
+     - `VITE_SUPABASE_ANON_KEY`: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHVzY2Jxc3FybGpoa3p1a2FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzOTU2MjAsImV4cCI6MjA2MDk3MTYyMH0.LS9TlpTsYNW859wHMwjdGkitDOcC5-YkkR93VKXCwDE`
+
+4. Click "Deploy Site"
 
 The Fleek deployment uses:
 - Direct connection to Supabase from the frontend
 - Supabase Auth for authentication
 - Supabase Database for data storage
 
-For more details on the deployment process, see `client/FLEEK_DEPLOYMENT.md`. 
+For more detailed instructions, see `client/FLEEK_DEPLOYMENT.md`. 
