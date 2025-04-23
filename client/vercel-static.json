@@ -1,0 +1,12 @@
+{
+  "buildCommand": "chmod +x ./static-vercel.sh && ./static-vercel.sh",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "true",
+  "env": {
+    "VITE_SUPABASE_URL": "https://ekhuscbqsqrljhkzukak.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHVzY2Jxc3FybGpoa3p1a2FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzOTU2MjAsImV4cCI6MjA2MDk3MTYyMH0.LS9TlpTsYNW859wHMwjdGkitDOcC5-YkkR93VKXCwDE",
+    "VITE_VERCEL_DEPLOYMENT": "true",
+    "VITE_API_URL": "https://ekhuscbqsqrljhkzukak.supabase.co"
+  }
+} 
