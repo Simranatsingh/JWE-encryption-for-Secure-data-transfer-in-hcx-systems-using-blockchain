@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { CpuArchitecture } from '../components/ui/cpu-architecture';
 import { toast } from 'react-toastify';
+import { login } from '../services/auth.service';
 
 // Animation variants
 const containerVariants = {
@@ -61,25 +62,18 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      console.log('Login submitted:', formData);
+      const result = await login(formData.email, formData.password);
       
-      // For demo purposes - success after 1 second delay
-      setTimeout(() => {
-        // Demo user validation (replace with actual API call)
-        if (formData.email && formData.password) {
-          toast.success('Login successful!');
-          // Save fake token to localStorage
-          localStorage.setItem('authToken', 'demo-token-12345');
-          navigate('/dashboard');
-        } else {
-          toast.error('Please fill in all fields');
-        }
-        setIsLoading(false);
-      }, 1000);
+      if (result.success) {
+        toast.success('Login successful!');
+        navigate('/dashboard');
+      } else {
+        toast.error(result.error || 'Login failed. Please check your credentials.');
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };

@@ -6,12 +6,13 @@ export default defineConfig(({ mode }) => {
   // Load env variables
   const env = loadEnv(mode, process.cwd(), '');
   const isWeb3Mode = env.VITE_WEB3_MODE === 'true';
+  const isFleekDeployment = env.VITE_FLEEK_DEPLOYMENT === 'true';
 
   return {
     plugins: [react()],
-    base: isWeb3Mode ? './' : '/', // Use relative paths for IPFS deployment
+    base: isWeb3Mode || isFleekDeployment ? './' : '/', // Use relative paths for IPFS/Fleek deployment
     server: {
-      port: 5173,
+      port: 5174,
       open: true,
       proxy: {
         '/api': {
@@ -34,9 +35,14 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.INFURA_PROJECT_ID': JSON.stringify(isWeb3Mode ? env.INFURA_PROJECT_ID || '' : 'your_infura_project_id'),
       'import.meta.env.IPFS_API_KEY': JSON.stringify(isWeb3Mode ? env.IPFS_API_KEY || '' : 'your_ipfs_api_key'),
       'import.meta.env.IPFS_API_SECRET': JSON.stringify(isWeb3Mode ? env.IPFS_API_SECRET || '' : 'your_ipfs_api_secret'),
-      'import.meta.env.VITE_API_URL': JSON.stringify(isWeb3Mode ? 'https://api.yourwebsite.com/api' : 'http://localhost:5005/api'),
+      'import.meta.env.VITE_API_URL': JSON.stringify(
+        isFleekDeployment 
+          ? 'https://ekhuscbqsqrljhkzukak.supabase.co' 
+          : (isWeb3Mode ? 'https://api.yourwebsite.com/api' : 'http://localhost:5005/api')
+      ),
       'import.meta.env.MODE': JSON.stringify(mode),
       'import.meta.env.WEB3_MODE': JSON.stringify(isWeb3Mode ? 'true' : 'false'),
+      'import.meta.env.FLEEK_DEPLOYMENT': JSON.stringify(isFleekDeployment ? 'true' : 'false'),
       'global': 'globalThis',
     },
     build: {

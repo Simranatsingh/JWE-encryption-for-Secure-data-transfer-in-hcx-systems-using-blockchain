@@ -1,90 +1,123 @@
-import axios from 'axios';
+import supabase from '../utils/supabase';
+import { toast } from 'react-toastify';
 
-// Get API URL from environment variable or use default
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005';
+// Register a new user
+export const register = async (userData) => {
+  try {
+    // Create user in Supabase auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: userData.email,
+      password: userData.password
+    });
 
-const authService = {
-  /**
-   * Register a new user
-   * @param {Object} userData - User data for registration
-   * @returns {Promise<Object>} Registration result
-   */
-  register: async (userData) => {
-    try {
-      console.log('Registering with API URL:', API_URL);
-      const response = await axios.post(`${API_URL}/api/auth/register`, userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      return response.data;
-    } catch (error) {
-      console.error('Registration error details:', error);
-      throw error.response ? error.response.data : error;
-    }
-  },
+    if (authError) throw authError;
 
-  /**
-   * Login a user
-   * @param {string} email - User email
-   * @param {string} password - User password
-   * @param {string} walletAddress - Optional wallet address
-   * @returns {Promise<Object>} Login result
-   */
-  login: async (email, password, walletAddress = null) => {
-    try {
-      console.log('Logging in with API URL:', API_URL);
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        email,
-        password,
-        walletAddress
-      });
-      
-      console.log('Login response:', response.data);
-      
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      return response.data;
-    } catch (error) {
-      console.error('Login error details:', error);
-      throw error.response ? error.response.data : error;
-    }
-  },
+    // Create profile in users table
+    const { data: profileData, error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
+        username: userData.username,
+        email: userData.email,
+        role: userData.role || 'patient',
+        profile: userData.profile || {},
+        encryption_keys: {}
+      })
+      .select()
+      .single();
 
-  /**
-   * Logout the current user
-   */
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  },
+    if (profileError) throw profileError;
 
-  /**
-   * Get the current user
-   * @returns {Object|null} Current user or null
-   */
-  getCurrentUser: () => {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
-  },
-
-  /**
-   * Get the auth token
-   * @returns {string|null} Auth token or null
-   */
-  getToken: () => {
-    return localStorage.getItem('token');
-  },
-
-  /**
-   * Check if user is authenticated
-   * @returns {boolean} True if authenticated
-   */
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
+    return { user: profileData, success: true };
+  } catch (error) {
+    console.error('Registration error:', error);
+    toast.error(error.message);
+    return { error: error.message, success: false };
   }
 };
 
-export default authService; 
+// Login user
+export const login = async (email, password) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    // Get user profile
+    const { data: profileData, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profileError) throw profileError;
+
+    // Store session in localStorage
+    localStorage.setItem('authToken', data.session.access_token);
+    localStorage.setItem('user', JSON.stringify(profileData));
+
+    return { user: profileData, success: true };
+  } catch (error) {
+    console.error('Login error:', error);
+    toast.error(error.message);
+    return { error: error.message, success: false };
+  }
+};
+
+// Logout user
+export const logout = async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) throw error;
+    
+    // Clear local storage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Logout error:', error);
+    toast.error(error.message);
+    return { error: error.message, success: false };
+  }
+};
+
+// Get current user
+export const getCurrentUser = async () => {
+  try {
+    // Check for session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      return { user: null, success: false };
+    }
+
+    // Get user profile
+    const { data: profileData, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profileError) throw profileError;
+    
+    return { user: profileData, success: true };
+  } catch (error) {
+    console.error('Get current user error:', error);
+    return { user: null, success: false };
+  }
+};
+
+// Get auth token
+export const getToken = () => {
+  return localStorage.getItem('authToken');
+};
+
+// Check if user is authenticated
+export const isAuthenticated = () => {
+  return !!localStorage.getItem('authToken');
+}; 

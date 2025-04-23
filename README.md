@@ -132,4 +132,21 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Ethereum and Web3.js for blockchain integration
 - IPFS for decentralized storage
 - Framer Motion for animations
-- Tailwind CSS for styling 
+- Tailwind CSS for styling
+
+## Deployment to Fleek
+
+This application has been configured for deployment to Fleek, which allows hosting on IPFS. Since Fleek doesn't support backend services, we've modified the application to connect directly to Supabase from the frontend.
+
+To deploy to Fleek:
+
+1. Follow the instructions in `client/FLEEK_DEPLOYMENT.md`
+2. Build the client with `npm run build:fleek`
+3. The client will connect directly to Supabase for authentication and data management
+
+The Fleek deployment uses:
+- Direct connection to Supabase from the frontend
+- Supabase Auth for authentication
+- Supabase Database for data storage
+
+For more details on the deployment process, see `client/FLEEK_DEPLOYMENT.md`. 
