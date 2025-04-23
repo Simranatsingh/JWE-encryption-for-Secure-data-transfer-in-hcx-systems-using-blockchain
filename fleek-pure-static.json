@@ -1,0 +1,7 @@
+{
+  "build": {
+    "image": "node:16",
+    "command": "chmod +x ./pure-static-build.sh && ./pure-static-build.sh",
+    "publicDir": "client/dist"
+  }
+} 
