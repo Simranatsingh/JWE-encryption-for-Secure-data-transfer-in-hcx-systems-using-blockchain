@@ -136,28 +136,24 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Deployment to Fleek
 
-This application has been configured for deployment to Fleek, which allows hosting on IPFS. Since Fleek doesn't support backend services, we've modified the application to connect directly to Supabase from the frontend.
+This application has been configured for deployment to Fleek, which allows hosting on IPFS.
 
-To deploy to Fleek:
+### Quick Deployment
 
-1. Log in to [Fleek](https://app.fleek.co/) and create a new site
-2. Connect to your GitHub repository: `Simranatsingh/JWE-encryption-for-Secure-data-transfer-in-hcx-systems-using-blockchain`
-3. Configure the build settings as follows:
-   - **Framework**: Other
-   - **Docker Image**: node:16
-   - **Build Command**: `bash ./build-for-fleek.sh`
-   - **Publish Directory**: `client/dist`
-   - **Base Directory**: `/` (default)
-   - **Environment Variables**:
-     - `VITE_FLEEK_DEPLOYMENT`: `true`
-     - `VITE_SUPABASE_URL`: `https://ekhuscbqsqrljhkzukak.supabase.co`
-     - `VITE_SUPABASE_ANON_KEY`: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHVzY2Jxc3FybGpoa3p1a2FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzOTU2MjAsImV4cCI6MjA2MDk3MTYyMH0.LS9TlpTsYNW859wHMwjdGkitDOcC5-YkkR93VKXCwDE`
+1. Go to [Fleek](https://app.fleek.co/)
+2. Connect to your GitHub repository
+3. Use the build command: `chmod +x ./pure-static-build.sh && ./pure-static-build.sh`
+4. Set the publish directory to: `client/dist`
 
-4. Click "Deploy Site"
+For detailed instructions, see [FLEEK_DEPLOYMENT_GUIDE.md](FLEEK_DEPLOYMENT_GUIDE.md).
 
-The Fleek deployment uses:
-- Direct connection to Supabase from the frontend
-- Supabase Auth for authentication
-- Supabase Database for data storage
+### What's Deployed
 
-For more detailed instructions, see `client/FLEEK_DEPLOYMENT.md`. 
+The Fleek deployment includes:
+- A static version of the application's interface
+- Connection to Supabase backend
+- Links to the GitHub repository and documentation
+
+The deployed application is accessible via:
+- Fleek URL: `https://[your-site-name].on.fleek.co`
+- IPFS hash: `ipfs://[your-ipfs-hash]` 
