@@ -10,10 +10,19 @@ echo "Cleaning dependency cache..."
 rm -rf node_modules/.vite
 rm -rf node_modules/.cache
 
+# Ensure specific dependencies are installed
+echo "Installing specific versions of problematic dependencies..."
+npm uninstall react-router-dom --no-save
+npm install react-router-dom@6.20.0 --save --no-fund --no-audit
+
 # Fix permissions for Vite executable
 echo "Setting permissions for Vite..."
 chmod +x ./node_modules/.bin/vite || true
 chmod +x ./node_modules/vite/bin/vite.js || true
+
+# Show dependency tree for debugging
+echo "Dependency tree for react-router-dom:"
+npm ls react-router-dom
 
 # Try direct build with npx 
 echo "Building with npx..."

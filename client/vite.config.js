@@ -1,87 +1,91 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import path from 'path';
 
-export default defineConfig(({ mode }) => {
-  // Load env variables
-  const env = loadEnv(mode, process.cwd(), '');
-  const isWeb3Mode = env.VITE_WEB3_MODE === 'true';
-  const isFleekDeployment = env.VITE_FLEEK_DEPLOYMENT === 'true';
+// Check for environment variables
+const isVercelDeployment = process.env.VITE_VERCEL_DEPLOYMENT === 'true';
+const isFleekDeployment = process.env.VITE_FLEEK_DEPLOYMENT === 'true';
+const isDevEnvironment = process.env.NODE_ENV === 'development';
 
-  return {
-    plugins: [react()],
-    base: isWeb3Mode || isFleekDeployment ? './' : '/', // Use relative paths for IPFS/Fleek deployment
-    server: {
-      port: 5174,
-      open: true,
-      proxy: {
-        '/api': {
-          target: 'http://localhost:5005',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
-        },
-      },
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
-    resolve: {
-      alias: {
-        process: 'process/browser',
-        stream: 'stream-browserify',
-        zlib: 'browserify-zlib',
-        util: 'util',
-      },
-    },
-    define: {
-      'import.meta.env.CONTRACT_ADDRESS': JSON.stringify(isWeb3Mode ? env.CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000' : 'your_deployed_contract_address'),
-      'import.meta.env.INFURA_PROJECT_ID': JSON.stringify(isWeb3Mode ? env.INFURA_PROJECT_ID || '' : 'your_infura_project_id'),
-      'import.meta.env.IPFS_API_KEY': JSON.stringify(isWeb3Mode ? env.IPFS_API_KEY || '' : 'your_ipfs_api_key'),
-      'import.meta.env.IPFS_API_SECRET': JSON.stringify(isWeb3Mode ? env.IPFS_API_SECRET || '' : 'your_ipfs_api_secret'),
-      'import.meta.env.VITE_API_URL': JSON.stringify(
-        isFleekDeployment 
-          ? 'https://ekhuscbqsqrljhkzukak.supabase.co' 
-          : (isWeb3Mode ? 'https://api.yourwebsite.com/api' : 'http://localhost:5005/api')
-      ),
-      'import.meta.env.MODE': JSON.stringify(mode),
-      'import.meta.env.WEB3_MODE': JSON.stringify(isWeb3Mode ? 'true' : 'false'),
-      'import.meta.env.FLEEK_DEPLOYMENT': JSON.stringify(isFleekDeployment ? 'true' : 'false'),
-      'global': 'globalThis',
-    },
-    build: {
-      outDir: 'dist',
-      assetsDir: 'assets',
-      sourcemap: !isWeb3Mode,
-      minify: isWeb3Mode ? 'esbuild' : false,
-      rollupOptions: {
-        onwarn(warning, warn) {
-          // Skip certain warnings
-          if (warning.code === 'UNRESOLVED_IMPORT' && 
-              warning.message.includes('motion-utils') && 
-              warning.message.includes('{}-config.mjs')) {
-            return;
-          }
-          // Skip circular dependency warnings from ethers.js
-          if (warning.code === 'CIRCULAR_DEPENDENCY' && 
-              (warning.message.includes('node_modules/ethers') || 
-               warning.message.includes('node_modules/web3'))) {
-            return;
-          }
-          // Use default for everything else
-          warn(warning);
-        },
-        output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            web3: ['web3', 'ethers'],
-          }
-        }
-      }
-    },
-    optimizeDeps: {
-      esbuildOptions: {
-        // Node.js global to browser globalThis
-        define: {
-          global: 'globalThis'
-        }
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+      'react-toastify',
+      'framer-motion',
+      'axios'
+    ],
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: 'globalThis'
       }
     }
-  };
+  },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Skip certain warnings
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return;
+        }
+        if (warning.message.includes('Use of eval')) {
+          return;
+        }
+        // Use default for everything else
+        warn(warning);
+      },
+      output: {
+        // Prevent vendor chunk splitting, to avoid the issue where too many 
+        // small chunks could crash the browser
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('web3.js') || id.includes('ethers') || id.includes('blockchain')) {
+              return 'web3';
+            }
+            return 'vendor';
+          }
+        },
+      },
+    },
+    // Generate sourcemaps 
+    sourcemap: isDevEnvironment,
+    // Don't minify in development mode
+    minify: !isDevEnvironment,
+  },
+  define: {
+    // Define global variables
+    __IS_DEV__: isDevEnvironment,
+    __VERCEL_DEPLOYMENT__: isVercelDeployment,
+    __FLEEK_DEPLOYMENT__: isFleekDeployment,
+  },
+  // Development server configuration
+  server: {
+    // Allow hot module replacement
+    hmr: true,
+    // Open the browser automatically in development
+    open: false,
+    // Port to use - will auto increment if in use
+    port: 5173,
+    // Show overlay on errors
+    overlay: true,
+    // Configure proxy for development API calls
+    proxy: isDevEnvironment ? {
+      '/api': {
+        target: 'http://localhost:5005',
+        changeOrigin: true,
+        secure: false,
+      }
+    } : {}
+  }
 });
