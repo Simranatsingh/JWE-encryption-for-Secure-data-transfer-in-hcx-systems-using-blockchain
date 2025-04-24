@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "bash -c \"chmod +x ./node_modules/.bin/vite 2>/dev/null || true && npx vite build --emptyOutDir\"",
-    "build:web3": "cross-env VITE_WEB3_MODE=true vite build",
-    "build:fleek": "cross-env VITE_FLEEK_DEPLOYMENT=true vite build --emptyOutDir --outDir dist",
+    "build": "npx vite build --emptyOutDir",
+    "build:web3": "cross-env VITE_WEB3_MODE=true npx vite build",
+    "build:fleek": "cross-env VITE_FLEEK_DEPLOYMENT=true npx vite build --emptyOutDir --outDir dist",
     "deploy": "npm run build:web3 && npm run deploy:ipfs",
     "deploy:ipfs": "npx ipfs-deploy ./dist -p infura",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",

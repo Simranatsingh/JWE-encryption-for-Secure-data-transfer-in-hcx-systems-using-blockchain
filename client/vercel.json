@@ -2,7 +2,7 @@
   "buildCommand": "chmod +x ./vercel-build.sh && ./vercel-build.sh",
   "outputDirectory": "dist",
   "framework": "vite",
-  "installCommand": "rm -rf node_modules && npm install --no-fund --no-audit --legacy-peer-deps",
+  "installCommand": "rm -rf node_modules && npm install --no-fund --no-audit --legacy-peer-deps --unsafe-perm",
   "env": {
     "VITE_SUPABASE_URL": "https://ekhuscbqsqrljhkzukak.supabase.co",
     "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVraHVzY2Jxc3FybGpoa3p1a2FrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUzOTU2MjAsImV4cCI6MjA2MDk3MTYyMH0.LS9TlpTsYNW859wHMwjdGkitDOcC5-YkkR93VKXCwDE",
