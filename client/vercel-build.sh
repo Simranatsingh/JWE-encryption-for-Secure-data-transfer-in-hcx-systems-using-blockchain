@@ -5,6 +5,11 @@ echo "Current directory: $(pwd)"
 echo "Node version: $(node -v)"
 echo "NPM version: $(npm -v)"
 
+# Clean dependency cache
+echo "Cleaning dependency cache..."
+rm -rf node_modules/.vite
+rm -rf node_modules/.cache
+
 # Fix permissions for Vite executable
 echo "Setting permissions for Vite..."
 chmod +x ./node_modules/.bin/vite || true
