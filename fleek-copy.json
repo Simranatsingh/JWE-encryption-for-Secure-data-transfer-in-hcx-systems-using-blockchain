@@ -1,7 +1,0 @@
-{
-  "build": {
-    "image": "node:16",
-    "command": "chmod +x ./copy-dist.sh && ./copy-dist.sh",
-    "publicDir": "client/dist"
-  }
-} 

@@ -1,7 +1,0 @@
-{
-  "build": {
-    "image": "node:16",
-    "command": "chmod +x ./direct-vite.sh && ./direct-vite.sh",
-    "publicDir": "client/dist"
-  }
-} 
